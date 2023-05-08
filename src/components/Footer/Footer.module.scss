@@ -1,0 +1,15 @@
+@import "../../styles/helpers";
+
+.footer {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  bottom: 0px;
+  right: 0px;
+  color: $base-dark-gray;
+  font-size: $font-size-sm;
+}
+
+.footerLabel {
+  margin-right: 4px;
+}
