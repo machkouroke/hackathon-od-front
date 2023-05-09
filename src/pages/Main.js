@@ -31,10 +31,12 @@ const Main = () => {
     const [sideShow, setSideShow] = React.useState(false)
     const [initUrgences, {isLoading}] = useInitUrgencesMutation()
     const [data, setData] = React.useState([])
+    const [inSubmit, setInSubmit] = React.useState(false)
 
 
     const submitForm = async (data) => {
         setSideShow(true)
+        setInSubmit(true)
         getLocation().then(async (res) => {
             const incidentData = {
                 ...data,
@@ -49,6 +51,7 @@ const Main = () => {
             await initUrgences(incidentData).unwrap()
                 .then((resultat) => {
                     setData(resultat)
+                    setInSubmit(false)
                     console.log("resultat", resultat)
                 })
                 .catch((err) => {
@@ -126,7 +129,9 @@ const Main = () => {
                             <div className={`flip-card-inner ${sideShow && "flip"}`}>
 
                                 <Itinerary className={`flip-card-back rounded shadow`} data={data}
-                                           isLoading={isLoading}/>
+                                           isLoading={inSubmit}
+
+                                />
                                 <div className={` flip-card-front`}>
                                     <img src={logo} alt="Error page"/>
 

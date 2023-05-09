@@ -73,7 +73,8 @@ const Itinerary = ({className, data, isLoading}) => {
 
     }, [data]);
 
-    return isLoading ? <Loader center={true}/> : <div id="map" className={`${className} leaflet-container`} ref={mapRef}></div>;
+    return isLoading  ? <Loader center={true}/> :
+        <div id="map" className={`${className} leaflet-container`} ref={mapRef}></div>;
 };
 
 
