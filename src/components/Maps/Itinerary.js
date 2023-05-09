@@ -1,13 +1,13 @@
 import React, {useEffect, useRef} from "react";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {data} from "./data";
 import fireTruck from "./icons/vehicleKind/fireTruck.svg";
 import policeStation from "./icons/vehicleKind/policeCar.svg";
 import ambulance from "./icons/vehicleKind/ambulance.svg";
 import incendie from "./icons/incidentKind/INCENDIE.svg";
 import accident from "./icons/incidentKind/ACCIDENT.svg";
 import agression from "./icons/incidentKind/AGGESSION.svg";
+import {Loader} from "../Loaders/Loader";
 
 const vehicleKind = {
     FIRE_TRUCK: {
@@ -28,13 +28,18 @@ const incidentKind = {
     ACCIDENT: accident,
     AGGRESSION: agression,
 }
-const Itinerary = ({className}) => {
+const Itinerary = ({className, data, isLoading}) => {
     const mapRef = useRef(null);
+
 
     useEffect(() => {
         if (mapRef.current && mapRef.current.children.length > 0) {
             return;
         }
+        if (!data.success) {
+            return;
+        }
+
         const map = L.map(mapRef.current, {attributionControl: false}).setView([32.8902554769109, -6.909138668081790], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -66,9 +71,9 @@ const Itinerary = ({className}) => {
             }
         )
 
-    }, []);
+    }, [data]);
 
-    return <div id="map" className={`${className} leaflet-container`} ref={mapRef}></div>;
+    return isLoading ? <Loader center={true}/> : <div id="map" className={`${className} leaflet-container`} ref={mapRef}></div>;
 };
 
 

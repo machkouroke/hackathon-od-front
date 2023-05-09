@@ -14,36 +14,51 @@ import Footer from "../components/Footer/Footer.js";
 import {useForm} from 'react-hook-form'
 import {UrgenceKind, UrgenceLevel} from "./mock/data";
 import {getLocation} from "../utilities/geo";
-import logo from "../assets/urgencia.svg";
+import logo from "../assets/Urgence.svg";
 import Itinerary from "../components/Maps/Itinerary";
+import {useInitUrgencesMutation} from "../services/api";
+import {Loader} from "../components/Loaders/Loader";
+import {AlertKind, level} from "../enum/enum";
+
 
 const Main = () => {
 
 
     const {
         register,
-        handleSubmit,
-        control
+        handleSubmit
     } = useForm();
     const [sideShow, setSideShow] = React.useState(false)
+    const [initUrgences, {isLoading}] = useInitUrgencesMutation()
+    const [data, setData] = React.useState([])
 
 
-    const submitForm = (data) => {
-        let geoError = null
+    const submitForm = async (data) => {
         setSideShow(true)
-        getLocation().then((res) => {
-            data['longitude'] = res[1].longitude
-            data['latitude'] = res[1].latitude
+        getLocation().then(async (res) => {
+            const incidentData = {
+                ...data,
+                /* parse value in float */
+                latitude: parseFloat(res[1].latitude),
+                longitude: parseFloat(res[1].longitude),
+                level: level[data.level],
+                kind: AlertKind[data.kind.toUpperCase()],
+                name: "Urgence à " + data.kind,
+            }
+
+            await initUrgences(incidentData).unwrap()
+                .then((resultat) => {
+                    setData(resultat)
+                    console.log("resultat", resultat)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
 
         }).catch((err) => {
-            geoError = err[1].errorMessage
+            alert("Veuillez activer votre localisation pour pouvoir envoyer votre urgence")
+            console.log(err)
         })
-        if (geoError) {
-            alert(geoError)
-            return
-        } else {
-            console.log(data)
-        }
 
 
     }
@@ -74,7 +89,7 @@ const Main = () => {
                                 <div className={"d-flex my-4"}>
                                     <FormGroup className=" mr-3">
                                         <FormText>Quelle est votre type d'urgence ?</FormText>
-                                        <select name="urgenceKind" id="urgenceKind" {...register('urgenceKind')}
+                                        <select id="kind" {...register('kind')}
                                                 className={"form-control mt-2"}>
                                             {UrgenceKind.map((item, index) => (
                                                 <option key={index} value={item}>{item}</option>
@@ -83,7 +98,7 @@ const Main = () => {
                                     </FormGroup>
                                     <FormGroup>
                                         <FormText>Quelle est votre niveau d'urgence ?</FormText>
-                                        <select name="" id="" {...register('urgenceLevel')}
+                                        <select id="level" {...register('level')}
                                                 className={"form-control mt-2"}>
                                             {UrgenceLevel.map((item, index) => (
                                                 <option key={index} value={item}>{item}</option>
@@ -94,8 +109,8 @@ const Main = () => {
 
                                 <FormGroup>
                                     <FormText>Donner une description de votre urgence</FormText>
-                                    <textarea className={"form-control mt-2"} name="" id=""
-                                              {...register('content')} required/>
+                                    <textarea className={"form-control mt-2"} id="description"
+                                              {...register('description')} required/>
                                 </FormGroup>
                                 <div className="bg-widget d-flex justify-content-center">
                                     <Button className="rounded-pill my-3" type="submit"
@@ -109,7 +124,9 @@ const Main = () => {
                     <Col xs={0} lg={6} className="right-column">
                         <div className="flip-card">
                             <div className={`flip-card-inner ${sideShow && "flip"}`}>
-                                <Itinerary className={`flip-card-back rounded shadow`}/>
+
+                                <Itinerary className={`flip-card-back rounded shadow`} data={data}
+                                           isLoading={isLoading}/>
                                 <div className={` flip-card-front`}>
                                     <img src={logo} alt="Error page"/>
 
