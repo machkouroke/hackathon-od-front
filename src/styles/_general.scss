@@ -80,3 +80,9 @@ ol {
     height: 2px;
     background: map-get($theme-colors, "primary");
 }
+
+.leaflet-container {
+    width: 500px;
+    height: 500px;
+    //border: None;
+}

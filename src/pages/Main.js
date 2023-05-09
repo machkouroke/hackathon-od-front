@@ -1,5 +1,5 @@
 import React from "react";
-
+import s from "./style.scss"
 import {
     Container,
     Row,
@@ -13,8 +13,9 @@ import Widget from "../components/Widget/Widget.js";
 import Footer from "../components/Footer/Footer.js";
 import {useForm} from 'react-hook-form'
 import {UrgenceKind, UrgenceLevel} from "./mock/data";
-import {Maps} from "../components/Maps/Maps";
 import {getLocation} from "../utilities/geo";
+import logo from "../assets/urgencia.svg";
+import Itinerary from "../components/Maps/Itinerary";
 
 const Main = () => {
 
@@ -24,10 +25,12 @@ const Main = () => {
         handleSubmit,
         control
     } = useForm();
+    const [sideShow, setSideShow] = React.useState(false)
 
 
     const submitForm = (data) => {
         let geoError = null
+        setSideShow(true)
         getLocation().then((res) => {
             data['longitude'] = res[1].longitude
             data['latitude'] = res[1].latitude
@@ -38,8 +41,7 @@ const Main = () => {
         if (geoError) {
             alert(geoError)
             return
-        }
-        else {
+        } else {
             console.log(data)
         }
 
@@ -61,8 +63,8 @@ const Main = () => {
                                 <p className="mb-0">
                                     ⚠️
                                     Veuillez noter que votre localisation nous seras envoyé automatiquement
-                                    pour qu'on puisse déléguer une équipe de secours le plus rapidement possible,
-                                    Veuillez donc confirmer le partage de votre localisation.
+                                    pour qu'on puisse déléguer une équipe de secours.
+
                                 </p>
                             </div>
 
@@ -105,7 +107,15 @@ const Main = () => {
                         </Widget>
                     </Col>
                     <Col xs={0} lg={6} className="right-column">
-                        <Maps/>
+                        <div className="flip-card">
+                            <div className={`flip-card-inner ${sideShow && "flip"}`}>
+                                <Itinerary className={`flip-card-back rounded shadow`}/>
+                                <div className={` flip-card-front`}>
+                                    <img src={logo} alt="Error page"/>
+
+                                </div>
+                            </div>
+                        </div>
                     </Col>
                 </Row>
             </Container>
